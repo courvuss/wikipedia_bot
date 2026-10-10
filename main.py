@@ -1,4 +1,4 @@
-#Импорты библиотек
+#<=== Импорты библиотек ===>
 from telebot.types import Message, ReplyKeyboardRemove
 import dotenv
 import telebot
@@ -12,17 +12,19 @@ wikipedia.set_lang('ru')
 dotenv.load_dotenv()
 bot = telebot.TeleBot(os.getenv("TOKEN"))
 
+#<=== Функция для стартовой команды ===>
 @bot.message_handler(commands=['start'])
 def start(message: Message):
     chat_id = message.chat.id
     bot.send_message(chat_id, 'Вас приветствует бот для статей википидии в телеграмме', reply_markup=menu_buttons())
-
+#<=== Функция для поиска в википедии через библиотеку - wikipedia ===>
 @bot.message_handler(regexp='Википедия')
 def reaction_wikipedia(message: Message):
     chat_id = message.chat.id
     bot.delete_message(chat_id, message.message_id)
     bot.send_message(chat_id, 'Введите текст для поиска в Википедии: ', reply_markup=ReplyKeyboardRemove())
-    bot.register_next_step_handler(message, get_text_for_wikipedia)
+    bot.register_next_step_handler(message, get_text_for_wikipedia)#<=== Запуск следуйшей функции ===>
+#<=== Получение ответа от википедии и в случае провала отправка сообщения об ошибке ===>
 def get_text_for_wikipedia(message: Message):
     chat_id = message.chat.id
     text = message.text
@@ -32,5 +34,5 @@ def get_text_for_wikipedia(message: Message):
         responce = 'Вы ввели неккоректный запрос повторите попытку!'
     bot.send_message(chat_id, responce, reply_markup=menu_buttons())
 
-
+#<=== Функция чтобы бот даже после ошибок продолжал работать ===>
 bot.infinity_polling()
